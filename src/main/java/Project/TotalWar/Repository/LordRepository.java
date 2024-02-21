@@ -1,4 +1,4 @@
 package Project.TotalWar.Repository;
 
-public class TotalWarRepository {
+public class LordRepository {
 }

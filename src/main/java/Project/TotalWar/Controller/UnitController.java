@@ -1,4 +1,4 @@
 package Project.TotalWar.Controller;
 
-public class TotalWarController {
+public class UnitController {
 }
