@@ -1,6 +1,7 @@
 package Project.TotalWar.Model;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "Unit")
@@ -27,64 +28,38 @@ public class UnitModel {
     @JoinColumn(name = "race_id")
     private RaceModel race;
 
-    // Constructors
-    public UnitModel() {
+    // Constructors, getters, and setters (omitted for brevity)
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        UnitModel other = (UnitModel) obj;
+        return Objects.equals(unitId, other.unitId) &&
+                Objects.equals(unitName, other.unitName) &&
+                Objects.equals(unitCost, other.unitCost) &&
+                Objects.equals(unitTier, other.unitTier) &&
+                Objects.equals(faction, other.faction) &&
+                Objects.equals(race, other.race);
     }
 
-    public UnitModel(String unitName, Integer unitCost, Integer unitTier, FactionModel faction, RaceModel race) {
-        this.unitName = unitName;
-        this.unitCost = unitCost;
-        this.unitTier = unitTier;
-        this.faction = faction;
-        this.race = race;
+    @Override
+    public int hashCode() {
+        return Objects.hash(unitId, unitName, unitCost, unitTier, faction, race);
     }
 
-    // Getters and setters
-    public Integer getUnitId() {
-        return unitId;
-    }
 
-    public void setUnitId(Integer unitId) {
-        this.unitId = unitId;
-    }
-
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName;
-    }
-
-    public Integer getUnitCost() {
-        return unitCost;
-    }
-
-    public void setUnitCost(Integer unitCost) {
-        this.unitCost = unitCost;
-    }
-
-    public Integer getUnitTier() {
-        return unitTier;
-    }
-
-    public void setUnitTier(Integer unitTier) {
-        this.unitTier = unitTier;
-    }
-
-    public FactionModel getFaction() {
-        return faction;
-    }
-
-    public void setFaction(FactionModel faction) {
-        this.faction = faction;
-    }
-
-    public RaceModel getRace() {
-        return race;
-    }
-
-    public void setRace(RaceModel race) {
-        this.race = race;
+    @Override
+    public String toString() {
+        return "UnitModel{" +
+                "unitId=" + unitId +
+                ", unitName='" + unitName + '\'' +
+                ", unitCost=" + unitCost +
+                ", unitTier=" + unitTier +
+                ", faction=" + faction +
+                ", race=" + race +
+                '}';
     }
 }

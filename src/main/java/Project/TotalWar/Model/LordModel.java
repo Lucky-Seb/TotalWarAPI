@@ -1,6 +1,7 @@
 package Project.TotalWar.Model;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "Lord")
@@ -24,56 +25,32 @@ public class LordModel {
     @JoinColumn(name = "faction_id")
     private FactionModel faction;
 
-    // Constructors
-    public LordModel() {
+    // Constructors, getters, and setters
+    // (omitted for brevity)
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        LordModel other = (LordModel) obj;
+        return Objects.equals(lordId, other.lordId);
     }
 
-    public LordModel(String lordId, String lordName, Boolean isFactionLeader, RaceModel race, FactionModel faction) {
-        this.lordId = lordId;
-        this.lordName = lordName;
-        this.isFactionLeader = isFactionLeader;
-        this.race = race;
-        this.faction = faction;
+    @Override
+    public int hashCode() {
+        return Objects.hash(lordId);
     }
 
-    // Getters and setters
-    public String getLordId() {
-        return lordId;
-    }
-
-    public void setLordId(String lordId) {
-        this.lordId = lordId;
-    }
-
-    public String getLordName() {
-        return lordName;
-    }
-
-    public void setLordName(String lordName) {
-        this.lordName = lordName;
-    }
-
-    public Boolean getIsFactionLeader() {
-        return isFactionLeader;
-    }
-
-    public void setIsFactionLeader(Boolean isFactionLeader) {
-        this.isFactionLeader = isFactionLeader;
-    }
-
-    public RaceModel getRace() {
-        return race;
-    }
-
-    public void setRace(RaceModel race) {
-        this.race = race;
-    }
-
-    public FactionModel getFaction() {
-        return faction;
-    }
-
-    public void setFaction(FactionModel faction) {
-        this.faction = faction;
+    @Override
+    public String toString() {
+        return "LordModel{" +
+                "lordId='" + lordId + '\'' +
+                ", lordName='" + lordName + '\'' +
+                ", isFactionLeader=" + isFactionLeader +
+                ", race=" + race +
+                ", faction=" + faction +
+                '}';
     }
 }
