@@ -8,9 +8,11 @@ import java.util.List;
 @Table(name = "Faction")
 public class FactionModel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "faction_id")
     private Long factionId;
 
+    @Column(name = "faction_name")
     private String factionName;
 
     @OneToMany(mappedBy = "faction", cascade = CascadeType.ALL)

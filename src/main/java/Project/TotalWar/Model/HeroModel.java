@@ -9,20 +9,23 @@ import jakarta.persistence.*;
 @Table(name = "Hero")
 public class HeroModel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "hero_id")
     private Long heroId;
-
+    @Column(name = "hero_name")
     private String heroName;
+    @Column(name = "hero_type")
     private String heroType;
+    @Column(name = "unique_hero")
     private boolean uniqueHero;
 
     @ManyToOne
-    @JoinColumn(name = "factionId")
+    @JoinColumn(name = "faction_Id")
     private FactionModel faction;
 
-/*    @OneToOne
-    @JoinColumn(name = "raceId")
-    private RaceModel race;*/
+    @OneToOne
+    @JoinColumn(name = "race_Id")
+    private RaceModel race;
 
     // getters and setters
     public Long getHeroId() {
@@ -53,15 +56,15 @@ public class HeroModel {
         return uniqueHero;
     }
 
-/*    public void setUniqueHero(boolean uniqueHero) {
+    public void setUniqueHero(boolean uniqueHero) {
         // Add a boolean check here if needed
-        if (uniqueHero) {
+/*        if (uniqueHero) {
             // Do something when isUniqueHero is set to true
         } else {
             // Do something when isUniqueHero is set to false
-        }
+        }*/
         this.uniqueHero = uniqueHero;
-    }*/
+    }
 
     public FactionModel getFaction() {
         return faction;
@@ -71,13 +74,13 @@ public class HeroModel {
         this.faction = faction;
     }
 
-/*    public RaceModel getRace() {
+    public RaceModel getRace() {
         return race;
     }
 
     public void setRace(RaceModel race) {
         this.race = race;
-    }*/
+    }
 
     @Override
     public int hashCode() {
