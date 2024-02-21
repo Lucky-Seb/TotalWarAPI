@@ -19,7 +19,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/factions")
 public class FactionController {
 
     private final FactionRepository factionRepository;
@@ -48,7 +47,7 @@ public class FactionController {
         return assembler.toModel(faction);
     }
 
-    @PostMapping("/faction/")
+    @PostMapping("/faction")
     ResponseEntity<EntityModel<FactionModel>> newFaction(@RequestBody FactionModel faction) {
         FactionModel newFaction = factionRepository.save(faction);
 

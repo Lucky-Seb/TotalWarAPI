@@ -20,7 +20,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/heroes")
 public class HeroController {
 
     private final HeroRepository heroRepository;
@@ -49,8 +48,9 @@ public class HeroController {
         return assembler.toModel(hero);
     }
 
-    @PostMapping("/hero/")
+    @PostMapping("/hero")
     ResponseEntity<EntityModel<HeroModel>> newHero(@RequestBody HeroModel hero) {
+        // Let the entity handle conversion from int to boolean
         HeroModel newHero = heroRepository.save(hero);
 
         return ResponseEntity
@@ -66,8 +66,9 @@ public class HeroController {
         // Update existingHero with properties from updatedHero
         existingHero.setHeroName(updatedHero.getHeroName());
         existingHero.setHeroType(updatedHero.getHeroType());
-        existingHero.setUniqueHero(updatedHero.isUniqueHero());
+        existingHero.setUniqueHero(updatedHero.getUniqueHero());
         existingHero.setFaction(updatedHero.getFaction());
+        existingHero.setRace(updatedHero.getRace());
         // Add other properties as needed
 
         HeroModel savedHero = heroRepository.save(existingHero);
@@ -80,8 +81,4 @@ public class HeroController {
         heroRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
-    // Add other methods as needed
-
-    // ... (other methods)
 }

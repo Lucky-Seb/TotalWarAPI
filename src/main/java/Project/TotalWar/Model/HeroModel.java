@@ -1,9 +1,8 @@
 package Project.TotalWar.Model;
 
+import jakarta.persistence.*;
 
 import java.util.Objects;
-
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Hero")
@@ -18,6 +17,9 @@ public class HeroModel {
     private String heroType;
     @Column(name = "unique_hero")
     private boolean uniqueHero;
+
+    // JSON property representing boolean as 1 or 0
+    private int uniqueHeroAsInt;
 
     @ManyToOne
     @JoinColumn(name = "faction_Id")
@@ -52,18 +54,26 @@ public class HeroModel {
         this.heroType = heroType;
     }
 
-    public boolean isUniqueHero() {
+    public boolean getUniqueHero() {
         return uniqueHero;
     }
 
     public void setUniqueHero(boolean uniqueHero) {
-        // Add a boolean check here if needed
-/*        if (uniqueHero) {
-            // Do something when isUniqueHero is set to true
-        } else {
-            // Do something when isUniqueHero is set to false
-        }*/
         this.uniqueHero = uniqueHero;
+        this.uniqueHeroAsInt = uniqueHero ? 1 : 0;
+    }
+
+    public int getUniqueHeroAsInt() {
+        return uniqueHeroAsInt;
+    }
+
+    public void setUniqueHeroAsInt(int uniqueHeroAsInt) {
+        if (uniqueHeroAsInt == 1) {
+            this.uniqueHero = true;
+        } else {
+            this.uniqueHero = false;
+        }
+        this.uniqueHeroAsInt = uniqueHeroAsInt;
     }
 
     public FactionModel getFaction() {
@@ -93,8 +103,9 @@ public class HeroModel {
                 "heroId=" + heroId +
                 ", heroName='" + heroName + '\'' +
                 ", heroType='" + heroType + '\'' +
-                ", uniqueHero=" + uniqueHero +
+                ", uniqueHero=" + uniqueHeroAsInt +
                 ", faction=" + faction +
                 '}';
     }
+
 }
