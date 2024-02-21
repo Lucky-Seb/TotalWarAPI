@@ -4,8 +4,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import Project.TotalWar.Controller.LordController;
 import Project.TotalWar.Model.LordModel;
-import com.example.GameAPI.controller.GameController;
-import com.example.GameAPI.model.Game;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
