@@ -1,6 +1,7 @@
 package Project.TotalWar.Model;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "Lord")
@@ -8,7 +9,7 @@ public class LordModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lord_id")
-    private String lordId;
+    private Long lordId;
 
     @Column(name = "lord_name")
     private String lordName;
@@ -24,11 +25,11 @@ public class LordModel {
     @JoinColumn(name = "faction_id")
     private FactionModel faction;
 
-    // Constructors
+    // Constructors, getters, and setters
     public LordModel() {
     }
 
-    public LordModel(String lordId, String lordName, Boolean isFactionLeader, RaceModel race, FactionModel faction) {
+    public LordModel(Long lordId, String lordName, Boolean isFactionLeader, RaceModel race, FactionModel faction) {
         this.lordId = lordId;
         this.lordName = lordName;
         this.isFactionLeader = isFactionLeader;
@@ -36,12 +37,11 @@ public class LordModel {
         this.faction = faction;
     }
 
-    // Getters and setters
-    public String getLordId() {
+    public Long getLordId() {
         return lordId;
     }
 
-    public void setLordId(String lordId) {
+    public void setLordId(Long lordId) {
         this.lordId = lordId;
     }
 
@@ -53,12 +53,12 @@ public class LordModel {
         this.lordName = lordName;
     }
 
-    public Boolean getIsFactionLeader() {
+    public Boolean getFactionLeader() {
         return isFactionLeader;
     }
 
-    public void setIsFactionLeader(Boolean isFactionLeader) {
-        this.isFactionLeader = isFactionLeader;
+    public void setFactionLeader(Boolean factionLeader) {
+        isFactionLeader = factionLeader;
     }
 
     public RaceModel getRace() {
@@ -75,5 +75,31 @@ public class LordModel {
 
     public void setFaction(FactionModel faction) {
         this.faction = faction;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        LordModel other = (LordModel) obj;
+        return Objects.equals(lordId, other.lordId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lordId);
+    }
+
+    @Override
+    public String toString() {
+        return "LordModel{" +
+                "lordId='" + lordId + '\'' +
+                ", lordName='" + lordName + '\'' +
+                ", isFactionLeader=" + isFactionLeader +
+                ", race=" + race +
+                ", faction=" + faction +
+                '}';
     }
 }
