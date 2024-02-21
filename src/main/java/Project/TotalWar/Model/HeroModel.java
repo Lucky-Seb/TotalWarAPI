@@ -22,7 +22,7 @@ public class HeroModel {
     private int uniqueHeroAsInt;
 
     @ManyToOne
-    @JoinColumn(name = "faction_Id")
+    @JoinColumn(name = "faction_Id", referencedColumnName = "faction_id")
     private FactionModel faction;
 
     @OneToOne
