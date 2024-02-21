@@ -22,7 +22,48 @@ public class RaceModel {
     @JoinColumn(name = "hero_id")
     private HeroModel hero;
 
-    // Constructors, getters, and setters (omitted for brevity)
+    // Constructors, getters, and setters
+    public RaceModel() {
+    }
+
+    public RaceModel(Long raceId, String raceName, FactionModel faction, HeroModel hero) {
+        this.raceId = raceId;
+        this.raceName = raceName;
+        this.faction = faction;
+        this.hero = hero;
+    }
+
+    public Long getRaceId() {
+        return raceId;
+    }
+
+    public void setRaceId(Long raceId) {
+        this.raceId = raceId;
+    }
+
+    public String getRaceName() {
+        return raceName;
+    }
+
+    public void setRaceName(String raceName) {
+        this.raceName = raceName;
+    }
+
+    public FactionModel getFaction() {
+        return faction;
+    }
+
+    public void setFaction(FactionModel faction) {
+        this.faction = faction;
+    }
+
+    public HeroModel getHero() {
+        return hero;
+    }
+
+    public void setHero(HeroModel hero) {
+        this.hero = hero;
+    }
 
     @Override
     public boolean equals(Object obj) {

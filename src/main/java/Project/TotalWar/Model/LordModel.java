@@ -9,7 +9,7 @@ public class LordModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lord_id")
-    private String lordId;
+    private Long lordId;
 
     @Column(name = "lord_name")
     private String lordName;
@@ -26,7 +26,56 @@ public class LordModel {
     private FactionModel faction;
 
     // Constructors, getters, and setters
-    // (omitted for brevity)
+    public LordModel() {
+    }
+
+    public LordModel(Long lordId, String lordName, Boolean isFactionLeader, RaceModel race, FactionModel faction) {
+        this.lordId = lordId;
+        this.lordName = lordName;
+        this.isFactionLeader = isFactionLeader;
+        this.race = race;
+        this.faction = faction;
+    }
+
+    public Long getLordId() {
+        return lordId;
+    }
+
+    public void setLordId(Long lordId) {
+        this.lordId = lordId;
+    }
+
+    public String getLordName() {
+        return lordName;
+    }
+
+    public void setLordName(String lordName) {
+        this.lordName = lordName;
+    }
+
+    public Boolean getFactionLeader() {
+        return isFactionLeader;
+    }
+
+    public void setFactionLeader(Boolean factionLeader) {
+        isFactionLeader = factionLeader;
+    }
+
+    public RaceModel getRace() {
+        return race;
+    }
+
+    public void setRace(RaceModel race) {
+        this.race = race;
+    }
+
+    public FactionModel getFaction() {
+        return faction;
+    }
+
+    public void setFaction(FactionModel faction) {
+        this.faction = faction;
+    }
 
     @Override
     public boolean equals(Object obj) {
