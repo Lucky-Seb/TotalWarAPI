@@ -9,16 +9,16 @@ public class UnitModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "unit_id")
-    private Integer unitId;
+    private Long unitId;
 
     @Column(name = "unit_name")
     private String unitName;
 
     @Column(name = "unit_cost")
-    private Integer unitCost;
+    private Long unitCost;
 
     @Column(name = "unit_tier")
-    private Integer unitTier;
+    private Long unitTier;
 
     @ManyToOne
     @JoinColumn(name = "faction_id")
@@ -28,8 +28,55 @@ public class UnitModel {
     @JoinColumn(name = "race_id")
     private RaceModel race;
 
-    // Constructors, getters, and setters (omitted for brevity)
 
+    // Getters and setters
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public Long getUnitCost() {
+        return unitCost;
+    }
+
+    public void setUnitCost(Long unitCost) {
+        this.unitCost = unitCost;
+    }
+
+    public Long getUnitTier() {
+        return unitTier;
+    }
+
+    public void setUnitTier(Long unitTier) {
+        this.unitTier = unitTier;
+    }
+
+    public FactionModel getFaction() {
+        return faction;
+    }
+
+    public void setFaction(FactionModel faction) {
+        this.faction = faction;
+    }
+
+    public RaceModel getRace() {
+        return race;
+    }
+
+    public void setRace(RaceModel race) {
+        this.race = race;
+    }
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
