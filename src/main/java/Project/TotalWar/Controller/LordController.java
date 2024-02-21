@@ -31,7 +31,6 @@ public class LordController {
         this.assembler = assembler;
     }
 
-
     // Aggregate root
     // tag::get-aggregate-root[]
     @GetMapping("/lords")
@@ -60,7 +59,6 @@ public class LordController {
 
         return assembler.toModel(lord);
     }
-
 
     @PutMapping("/lord/{id}")
     LordModel replaceLord(@RequestBody LordModel newLord, @PathVariable Long id) {
