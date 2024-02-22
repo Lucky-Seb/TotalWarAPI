@@ -1,6 +1,9 @@
 package Project.TotalWar.Controller;
 
+import Project.TotalWar.DTO.HeroDTO;
+import Project.TotalWar.Model.FactionModel;
 import Project.TotalWar.Model.HeroModel;
+import Project.TotalWar.Repository.FactionRepository;
 import Project.TotalWar.Repository.HeroRepository;
 import Project.TotalWar.util.HeroModelAssembler;
 import Project.TotalWar.util.NotFoundException;
@@ -24,10 +27,12 @@ public class HeroController {
 
     private final HeroRepository heroRepository;
     private final HeroModelAssembler assembler;
+    private final FactionRepository factionRepository; // Add this line
 
-    HeroController(HeroRepository heroRepository, HeroModelAssembler assembler) {
+    HeroController(HeroRepository heroRepository, HeroModelAssembler assembler, FactionRepository factionRepository) {
         this.heroRepository = heroRepository;
         this.assembler = assembler;
+        this.factionRepository = factionRepository; // Initialize factionRepository
     }
 
     @GetMapping("/heros")
@@ -41,44 +46,103 @@ public class HeroController {
     }
 
     @GetMapping("/hero/{id}")
-    public EntityModel<HeroModel> one(@PathVariable Long id) {
+    public EntityModel<HeroDTO> one(@PathVariable Long id) {
         HeroModel hero = heroRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
 
-        return assembler.toModel(hero);
+        // Convert HeroModel to HeroDTO
+        HeroDTO heroDTO = convertToHeroDTO(hero);
+
+        // Include faction information in the DTO
+        FactionModel faction = hero.getFaction();
+        if (faction != null) {
+            heroDTO.setFactionId(faction.getFactionId());
+            heroDTO.setFactionName(faction.getFactionName());
+            // Include other faction information as needed
+        }
+
+        // Create EntityModel for HeroDTO
+        EntityModel<HeroDTO> entityModel = EntityModel.of(heroDTO);
+
+        // Add self link
+        entityModel.add(linkTo(methodOn(HeroController.class).one(id)).withSelfRel());
+
+        return entityModel;
     }
 
-    @PostMapping("/hero")
-    ResponseEntity<EntityModel<HeroModel>> newHero(@RequestBody HeroModel hero) {
-        // Let the entity handle conversion from int to boolean
-        HeroModel newHero = heroRepository.save(hero);
 
+    @PostMapping("/hero")
+    public ResponseEntity<EntityModel<HeroModel>> newHero(@RequestBody HeroDTO heroDTO) {
+        // Map data from HeroDTO to HeroModel
+        HeroModel newHero = convertToHeroModel(heroDTO);
+
+        // Fetch the faction entity using the provided faction ID
+        FactionModel faction = factionRepository.findById(heroDTO.getFactionId())
+                .orElseThrow(() -> new NotFoundException(heroDTO.getFactionId()));
+
+        // Set the faction for the hero
+        newHero.setFaction(faction);
+
+        // Save the hero entity
+        HeroModel savedHero = heroRepository.save(newHero);
+
+        // Return the saved hero entity wrapped in an EntityModel
         return ResponseEntity
-                .created(linkTo(methodOn(HeroController.class).one(newHero.getHeroId())).toUri())
-                .body(assembler.toModel(newHero));
+                .created(linkTo(methodOn(HeroController.class).one(savedHero.getHeroId())).toUri())
+                .body(assembler.toModel(savedHero));
     }
 
     @PutMapping("/hero/{id}")
-    ResponseEntity<EntityModel<HeroModel>> updateHero(@PathVariable Long id, @RequestBody HeroModel updatedHero) {
+    ResponseEntity<EntityModel<HeroModel>> updateHero(@PathVariable Long id, @RequestBody HeroDTO updatedHeroDTO) {
+        // Map data from HeroDTO to HeroModel
         HeroModel existingHero = heroRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
+        updateHeroFromDTO(existingHero, updatedHeroDTO);
 
-        // Update existingHero with properties from updatedHero
-        existingHero.setHeroName(updatedHero.getHeroName());
-        existingHero.setHeroType(updatedHero.getHeroType());
-        existingHero.setUniqueHero(updatedHero.getUniqueHero());
-        existingHero.setFaction(updatedHero.getFaction());
-        existingHero.setRace(updatedHero.getRace());
-        // Add other properties as needed
-
+        // Save the updated hero entity
         HeroModel savedHero = heroRepository.save(existingHero);
 
         return ResponseEntity.ok(assembler.toModel(savedHero));
     }
+
 
     @DeleteMapping("/hero/{id}")
     ResponseEntity<?> deleteHero(@PathVariable Long id) {
         heroRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Utility method to convert HeroDTO to HeroModel
+    private HeroModel convertToHeroModel(HeroDTO heroDTO) {
+        HeroModel hero = new HeroModel();
+        hero.setHeroName(heroDTO.getHeroName());
+        hero.setHeroType(heroDTO.getHeroType());
+        hero.setUniqueHero(heroDTO.isUniqueHero());
+        // Set other properties as needed
+        return hero;
+    }
+
+    // Utility method to update HeroModel from HeroDTO
+    private void updateHeroFromDTO(HeroModel hero, HeroDTO heroDTO) {
+        hero.setHeroName(heroDTO.getHeroName());
+        hero.setHeroType(heroDTO.getHeroType());
+        hero.setUniqueHero(heroDTO.isUniqueHero());
+        // Update other properties as needed
+    }
+
+    private HeroDTO convertToHeroDTO(HeroModel hero) {
+        HeroDTO heroDTO = new HeroDTO();
+        heroDTO.setHeroId(hero.getHeroId());
+        heroDTO.setHeroName(hero.getHeroName());
+        heroDTO.setHeroType(hero.getHeroType());
+        heroDTO.setUniqueHero(hero.getUniqueHero());
+        // Set faction ID if needed
+        FactionModel faction = hero.getFaction();
+        if (faction != null) {
+            heroDTO.setFactionId(faction.getFactionId());
+            heroDTO.setFactionName(faction.getFactionName());
+        }
+        return heroDTO;
+    }
+
 }

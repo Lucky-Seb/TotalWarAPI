@@ -1,6 +1,7 @@
 package Project.TotalWar.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +17,8 @@ public class FactionModel {
     @Column(name = "faction_name")
     private String factionName;
 
-    @OneToMany(mappedBy = "faction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "faction", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference // Add this annotation
     private List<HeroModel> heroes;
 
     // Constructors, getters, and setters

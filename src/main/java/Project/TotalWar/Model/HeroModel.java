@@ -1,5 +1,6 @@
 package Project.TotalWar.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -21,9 +22,10 @@ public class HeroModel {
     // JSON property representing boolean as 1 or 0
     private int uniqueHeroAsInt;
 
-    @ManyToOne
-    @JoinColumn(name = "faction_Id", referencedColumnName = "faction_id")
-    private FactionModel faction;
+    @ManyToOne(fetch = FetchType.EAGER) // Specifies Many-to-One relationship with eager fetching
+    @JoinColumn(name = "faction_Id", referencedColumnName = "faction_id") // Specifies the foreign key column and its reference
+    @JsonBackReference // Add this annotation
+    private FactionModel faction; // Reference to the associated faction
 
     @OneToOne
     @JoinColumn(name = "race_Id")

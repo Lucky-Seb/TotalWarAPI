@@ -5,6 +5,8 @@ public class HeroDTO {
     private String heroName;
     private String heroType;
     private boolean uniqueHero;
+    private Long factionId; // Add factionId property
+    private String factionName; // Add factionName field
 
     // Getters and setters
 
@@ -38,5 +40,21 @@ public class HeroDTO {
 
     public void setUniqueHero(boolean uniqueHero) {
         this.uniqueHero = uniqueHero;
+    }
+
+    public Long getFactionId() {
+        return factionId;
+    }
+
+    public void setFactionId(Long factionId) {
+        this.factionId = factionId;
+    }
+
+    public String getFactionName() {
+        return factionName;
+    }
+
+    public void setFactionName(String factionName) {
+        this.factionName = factionName;
     }
 }

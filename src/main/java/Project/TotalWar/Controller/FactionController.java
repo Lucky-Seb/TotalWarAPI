@@ -34,7 +34,7 @@ public class FactionController {
                 .map(this::convertToFactionDTO)
                 .collect(Collectors.toList());
 
-        // Populate heroes for each faction if needed
+        // Populate heroes for each faction
         for (FactionDTO factionDTO : factionDTOs) {
             Long factionId = factionDTO.getFactionId();
             List<HeroModel> heroes = heroRepository.findByFactionId(factionId);
