@@ -16,8 +16,8 @@ public class FactionModelAssembler implements RepresentationModelAssembler<Facti
         // Unconditional links to single-item resource and aggregate root
 
         EntityModel<FactionModel> factionModel = EntityModel.of(faction,
-                linkTo(methodOn(FactionController.class).one(faction.getFactionId())).withSelfRel(),
-                linkTo(methodOn(FactionController.class).all()).withRel("factions"));
+                linkTo(methodOn(FactionController.class).getFactionById(faction.getFactionId())).withSelfRel(),
+                linkTo(methodOn(FactionController.class).getAllFactions()).withRel("factions"));
 
         // Add additional links as needed for FactionModel
 

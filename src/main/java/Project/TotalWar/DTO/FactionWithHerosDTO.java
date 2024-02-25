@@ -3,7 +3,7 @@ package Project.TotalWar.DTO;
 import java.util.List;
 
 public class FactionWithHerosDTO {
-    private Long factionId;
+    private Long id;
     private String factionName;
     private List<HeroDTO> heroes;
 
@@ -11,18 +11,18 @@ public class FactionWithHerosDTO {
     public FactionWithHerosDTO() {
     }
 
-    public FactionWithHerosDTO(Long factionId, String factionName, List<HeroDTO> heroes) {
-        this.factionId = factionId;
+    public FactionWithHerosDTO(Long id, String factionName, List<HeroDTO> heroes) {
+        this.id = id;
         this.factionName = factionName;
         this.heroes = heroes;
     }
 
-    public Long getFactionId() {
-        return factionId;
+    public Long getId() {
+        return id;
     }
 
-    public void setFactionId(Long factionId) {
-        this.factionId = factionId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFactionName() {

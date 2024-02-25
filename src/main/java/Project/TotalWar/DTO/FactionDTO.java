@@ -3,18 +3,18 @@ package Project.TotalWar.DTO;
 import java.util.List;
 
 public class FactionDTO {
-    private Long factionId;
+    private Long id;
     private String factionName;
     private List<HeroDTO> heroes;
 
     // Getters and setters
 
-    public Long getFactionId() {
-        return factionId;
+    public Long getId() {
+        return id;
     }
 
-    public void setFactionId(Long factionId) {
-        this.factionId = factionId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFactionName() {

@@ -1,12 +1,16 @@
 package Project.TotalWar.Controller;
 
 import Project.TotalWar.DTO.FactionDTO;
+import Project.TotalWar.DTO.FactionWithHerosDTO;
 import Project.TotalWar.DTO.HeroDTO;
 import Project.TotalWar.Model.FactionModel;
 import Project.TotalWar.Model.HeroModel;
 import Project.TotalWar.Repository.FactionRepository;
 import Project.TotalWar.Repository.HeroRepository;
+import Project.TotalWar.mappers.FactionMapper;
+import Project.TotalWar.mappers.HeroMapper;
 import Project.TotalWar.util.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,120 +24,121 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class FactionController {
 
     private final FactionRepository factionRepository;
-    private final HeroRepository heroRepository; // Add this line
+    private final HeroRepository heroRepository;
+    @Autowired
+    private FactionMapper factionMapper;
+    @Autowired
+    private HeroMapper heroMapper;
 
-    FactionController(FactionRepository factionRepository, HeroRepository heroRepository) { // Update constructor
+    @Autowired
+    public FactionController(FactionRepository factionRepository, HeroRepository heroRepository) {
         this.factionRepository = factionRepository;
-        this.heroRepository = heroRepository; // Initialize heroRepository
+        this.heroRepository = heroRepository;
     }
 
     @GetMapping("/factions")
-    public ResponseEntity<List<FactionDTO>> all() {
-        List<FactionModel> factions = factionRepository.findAll();
-        List<FactionDTO> factionDTOs = factions.stream()
-                .map(this::convertToFactionDTO)
-                .collect(Collectors.toList());
-
-        // Populate heroes for each faction
-        for (FactionDTO factionDTO : factionDTOs) {
-            Long factionId = factionDTO.getFactionId();
-            List<HeroModel> heroes = heroRepository.findByFactionId(factionId);
-            List<HeroDTO> heroDTOs = heroes.stream()
-                    .map(this::convertToHeroDTO)
-                    .collect(Collectors.toList());
-            factionDTO.setHeroes(heroDTOs);
-        }
-
-        return ResponseEntity.ok(factionDTOs);
+    public ResponseEntity<List<FactionDTO>> getAllFactions() {
+        List<FactionModel> factions = factionRepository.findAllWithEagerRelationships();
+        return ResponseEntity.ok(factionMapper.toList(factions, FactionDTO.class));
     }
 
-    @GetMapping("/faction/{id}")
-    public ResponseEntity<FactionDTO> one(@PathVariable Long id) {
-        FactionModel faction = factionRepository.findById(id)
+    @GetMapping("/factions/{id}")
+    public ResponseEntity<FactionDTO> getFactionById(@PathVariable Long id) {
+        return factionRepository.findByIdWithEagerRelationships(id)
+                .map(factionMapper::toDTO) // Use mapper for conversion
+                .map(ResponseEntity::ok)
                 .orElseThrow(() -> new NotFoundException(id));
-        FactionDTO factionDTO = convertToFactionDTO(faction);
-
-        return ResponseEntity.ok(factionDTO);
+    }
+    @GetMapping("/factions/{id}/with-heroes")
+    public ResponseEntity<FactionWithHerosDTO> getFactionWithHeroes(@PathVariable Long id) {
+        FactionModel faction = factionRepository.findByIdWithEagerRelationships(id)
+                .orElseThrow(() -> new NotFoundException(id));
+        return ResponseEntity.ok(factionMapper.toFactionWithHeroesDTO(faction));
     }
 
-    @PostMapping("/faction")
-    public ResponseEntity<FactionDTO> newFaction(@RequestBody FactionDTO factionDTO) {
-        FactionModel faction = convertToFactionModel(factionDTO);
-
-        // Ensure the heroes are not null before attempting to associate them with the faction
-        if (factionDTO.getHeroes() != null) {
-            List<HeroModel> heroes = factionDTO.getHeroes().stream()
-                    .map(this::convertToHeroModel)
-                    .collect(Collectors.toList());
-            faction.setHeroes(heroes);
-        }
-
-        FactionModel savedFaction = factionRepository.save(faction);
-        FactionDTO savedFactionDTO = convertToFactionDTO(savedFaction);
-
-        return ResponseEntity
-                .created(linkTo(methodOn(FactionController.class).one(savedFactionDTO.getFactionId())).toUri())
-                .body(savedFactionDTO);
+    @PostMapping("/factions")
+    public ResponseEntity<FactionDTO> createFaction(@RequestBody FactionDTO factionDTO) {
+        FactionModel faction = factionRepository.save(factionMapper.toModel(factionDTO)); // Use mapper for conversion
+        return ResponseEntity.created(linkTo(methodOn(FactionController.class).getFactionById(faction.getFactionId())).toUri())
+                .body(factionMapper.toDTO(faction)); // Use mapper for conversion
     }
 
-    @PutMapping("/faction/{id}")
+    @PutMapping("/factions/{id}")
     public ResponseEntity<FactionDTO> updateFaction(@PathVariable Long id, @RequestBody FactionDTO updatedFactionDTO) {
         FactionModel existingFaction = factionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
 
-        // Update existingFaction with properties from updatedFactionDTO
-        existingFaction.setFactionName(updatedFactionDTO.getFactionName());
-        // Update other properties as needed
+        // Use mapper to update existingFaction with values from updatedFactionDTO
+        factionMapper.updateModel(existingFaction, updatedFactionDTO);
+
+        // Optionally, update any properties not handled by the mapper manually
 
         FactionModel savedFaction = factionRepository.save(existingFaction);
-        FactionDTO savedFactionDTO = convertToFactionDTO(savedFaction);
-
-        return ResponseEntity.ok(savedFactionDTO);
+        return ResponseEntity.ok(factionMapper.toDTO(savedFaction));
     }
 
-    @DeleteMapping("/faction/{id}")
+    @DeleteMapping("/factions/{id}")
     public ResponseEntity<?> deleteFaction(@PathVariable Long id) {
         factionRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    // Utility methods for conversion between DTO and Entity
-    private FactionDTO convertToFactionDTO(FactionModel faction) {
-        FactionDTO factionDTO = new FactionDTO();
-        factionDTO.setFactionId(faction.getFactionId());
-        factionDTO.setFactionName(faction.getFactionName());
-        // You might need to map heroes here if you don't want to load them eagerly
-        // factionDTO.setHeroes(convertToHeroDTOList(faction.getHeroes()));
-        return factionDTO;
+    // Add a hero to a faction
+    @PostMapping("/factions/{factionId}/heroes")
+    public ResponseEntity<HeroDTO> addHeroToFaction(@PathVariable Long factionId, @RequestBody HeroDTO heroDTO) {
+        FactionModel faction = factionRepository.findById(factionId)
+                .orElseThrow(() -> new NotFoundException(factionId));
+
+        // Ensure heroDTO has the correct faction ID set
+        heroDTO.setFactionId(factionId);  // Or similar logic to link the hero to the faction
+
+        HeroModel hero = heroRepository.save(heroMapper.toModel(heroDTO)); // Use mapper for conversion
+        return ResponseEntity.created(linkTo(methodOn(FactionController.class).getFactionHero(factionId, hero.getHeroId())).toUri())
+                .body(heroMapper.toDTO(hero)); // Use mapper for conversion
     }
 
-    private HeroDTO convertToHeroDTO(HeroModel hero) {
-        HeroDTO heroDTO = new HeroDTO();
-        heroDTO.setHeroId(hero.getHeroId());
-        heroDTO.setHeroName(hero.getHeroName());
-        // Set other properties as needed
-        return heroDTO;
+    // Get a specific hero within a faction
+    @GetMapping("/factions/{factionId}/heroes/{heroId}")
+    public ResponseEntity<HeroDTO> getFactionHero(@PathVariable Long factionId, @PathVariable Long heroId) {
+        FactionModel faction = factionRepository.findById(factionId)
+                .orElseThrow(() -> new NotFoundException(factionId));
+        HeroModel hero = heroRepository.findById(heroId)
+                .orElseThrow(() -> new NotFoundException(heroId));
+
+        // Ensure the hero belongs to the faction
+        if (!faction.getHeroes().contains(hero)) {
+            throw new NotFoundException(heroId);
+        }
+
+        return ResponseEntity.ok(heroMapper.toDTO(hero));
     }
 
+    // Update a hero within a faction
+    @PutMapping("/factions/{factionId}/heroes/{heroId}")
+    public ResponseEntity<HeroDTO> updateFactionHero(@PathVariable Long factionId, @PathVariable Long heroId, @RequestBody HeroDTO updatedHeroDTO) {
+        // Fetch the existing hero
+        HeroModel existingHero = heroRepository.findById(heroId)
+                .orElseThrow(() -> new NotFoundException(heroId));
 
-    private FactionModel convertToFactionModel(FactionDTO factionDTO) {
-        FactionModel faction = new FactionModel();
-        faction.setFactionId(factionDTO.getFactionId());
-        faction.setFactionName(factionDTO.getFactionName());
-        // You might need to map heroes here if you don't want to load them eagerly
-        // faction.setHeroes(convertToHeroModelList(factionDTO.getHeroes()));
-        return faction;
+        // Update properties using mapper
+        heroMapper.updateModel(existingHero, updatedHeroDTO);
+
+        // Optionally, update any properties not handled by the mapper manually
+
+        // Save the updated hero
+        heroRepository.save(existingHero);
+
+        return ResponseEntity.ok(heroMapper.toDTO(existingHero)); // Return the updated DTO
     }
 
-    private HeroModel convertToHeroModel(HeroDTO heroDTO) {
-        HeroModel hero = new HeroModel();
-        hero.setHeroId(heroDTO.getHeroId());
-        hero.setHeroName(heroDTO.getHeroName());
-        hero.setHeroType(heroDTO.getHeroType());
-        hero.setUniqueHero(heroDTO.isUniqueHero());
-        // Set other properties as needed
+    // Delete a hero from a faction
+    @DeleteMapping("/factions/{factionId}/heroes/{heroId}")
+    public ResponseEntity<?> deleteFactionHero(@PathVariable Long factionId, @PathVariable Long heroId) {
+        // Ensure hero belongs to the faction (similar to getFactionHero)
 
-        return hero;
+        // Delete the hero using repository
+        // ...
+
+        return ResponseEntity.noContent().build();
     }
-
 }

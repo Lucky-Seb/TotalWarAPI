@@ -28,7 +28,7 @@ public class FactionService {
 
     private FactionWithHerosDTO convertToFactionWithHerosDTO(FactionModel faction) {
         FactionWithHerosDTO factionDTO = new FactionWithHerosDTO();
-        factionDTO.setFactionId(faction.getFactionId());
+        factionDTO.setId(faction.getFactionId());
         factionDTO.setFactionName(faction.getFactionName());
         factionDTO.setHeroes(faction.getHeroes().stream()
                 .map(this::convertToHeroDTO)
